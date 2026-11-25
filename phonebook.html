@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>乳腺外科医生电话簿</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: #eef2f5;
+    color: #1f2d3d;
+    -webkit-font-smoothing: antialiased;
+  }
+  .top {
+    background: linear-gradient(135deg, #1f8a8a, #2bb6a8);
+    color: #fff;
+    padding: 20px 18px 16px;
+  }
+  .top h1 { margin: 0; font-size: 19px; font-weight: 700; }
+  .top .sub { margin-top: 4px; font-size: 13px; opacity: .9; }
+  .updated {
+    background: #eafaf7; color: #1f8a8a;
+    font-size: 12px; text-align: center; padding: 6px 10px;
+    border-bottom: 1px solid #cdeee7;
+  }
+  .search {
+    padding: 12px 14px;
+    background: #fff;
+    position: sticky; top: 0; z-index: 5;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .search input {
+    width: 100%; border: 1px solid #d5dde3; border-radius: 22px;
+    padding: 10px 16px; font-size: 15px; outline: none; background: #f7f9fb;
+  }
+  .group { margin: 12px 12px 0; }
+  .group-title {
+    font-size: 14px; font-weight: 700; color: #1f8a8a;
+    margin: 6px 2px 8px; display: flex; align-items: center; gap: 6px;
+  }
+  .group-title::before {
+    content: ""; width: 4px; height: 15px; background: #2bb6a8; border-radius: 2px;
+  }
+  .card {
+    background: #fff; border-radius: 12px; padding: 12px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 9px; box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .info .name { font-size: 16px; font-weight: 600; }
+  .info .meta { font-size: 12px; color: #8a97a3; margin-top: 3px; }
+  .call {
+    flex: 0 0 auto; margin-left: 12px;
+    background: #2bb6a8; color: #fff; text-decoration: none;
+    padding: 10px 16px; border-radius: 22px; font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; gap: 6px; white-space: nowrap;
+  }
+  .call:active { background: #178f83; }
+  .call svg { width: 16px; height: 16px; fill: #fff; }
+  .pending { flex: 0 0 auto; margin-left: 12px; color: #b0bac2; font-size: 13px; align-self: center; }
+  .footer {
+    padding: 14px; text-align: center; font-size: 12px; color: #9aa6b0; line-height: 1.6;
+  }
+  .empty { text-align: center; color: #9aa6b0; padding: 40px 0; font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <h1>乳腺外科医生电话簿</h1>
+  <div class="sub">患者联系医生 · 按治疗组分组</div>
+</div>
+
+<div class="updated" id="updatedBar"></div>
+
+<div class="search">
+  <input id="q" type="search" placeholder="输入医生姓名快速查找" oninput="render()">
+</div>
+
+<div id="list"></div>
+
+<div class="footer">
+  本页名单随科室轮转定期更新<br>
+  微信内点号码若无法直接拨出，请点右上角 ⋯ 选“在浏览器打开”
+</div>
+
+<script>
+// ====== 数据区：以后换人，只改这里就行 ======
+// groups 里的 name 是“组名（带组教授）”，doctors 是该组医生
+// 每个医生：name 姓名，title 备注，phone 手机号（为空表示待补充）
+const UPDATED = "2026-11-09";
+document.getElementById('updatedBar').textContent = "名单更新于 " + UPDATED + " · 共 9 个治疗组";
+
+const groups = [
+  {
+    name: "徐景伟 组（带组教授）",
+    doctors: [
+      { name: "徐景伟", title: "带组教授", phone: "" },
+      { name: "陈国栋", title: "医生", phone: "13104494487" },
+      { name: "王新宇", title: "医生", phone: "17684329498" },
+      { name: "王铎",   title: "医生", phone: "15500007662" }
+    ]
+  },
+  {
+    name: "姜义 组（带组教授）",
+    doctors: [
+      { name: "姜义", title: "带组教授", phone: "" },
+      { name: "王京", title: "医生", phone: "13604316601" }
+    ]
+  },
+  {
+    name: "刘斌 组（带组教授）",
+    doctors: [
+      { name: "刘斌", title: "带组教授", phone: "" },
+      { name: "杜彤华", title: "医生", phone: "18088655442" },
+      { name: "孙珂", title: "医生", phone: "15843010436" }
+    ]
+  },
+  {
+    name: "金镝 组（带组教授）",
+    doctors: [
+      { name: "金镝", title: "带组教授", phone: "" },
+      { name: "张一帆", title: "医生", phone: "15543139266" }
+    ]
+  },
+  {
+    name: "陈云波、张研 组（带组教授）",
+    doctors: [
+      { name: "陈云波", title: "带组教授", phone: "" },
+      { name: "张研",   title: "带组教授", phone: "" },
+      { name: "左舒婷", title: "医生", phone: "15948775226" },
+      { name: "姜晓曼", title: "医生", phone: "18844194769" }
+    ]
+  },
+  {
+    name: "张颖超 组（带组教授）",
+    doctors: [
+      { name: "张颖超", title: "带组教授", phone: "" },
+      { name: "刘泰源", title: "医生", phone: "18842627950" },
+      { name: "高紫闻", title: "医生", phone: "15662249615" }
+    ]
+  },
+  {
+    name: "王丹 组（带组教授）",
+    doctors: [
+      { name: "王丹",   title: "带组教授", phone: "" },
+      { name: "姜朋丽", title: "医生", phone: "18243081727" },
+      { name: "朱虹蓂", title: "医生", phone: "13039106695" }
+    ]
+  },
+  {
+    name: "尹光浩 组（带组教授）",
+    doctors: [
+      { name: "尹光浩", title: "带组教授", phone: "" },
+      { name: "黄旭",   title: "医生", phone: "17604306443" }
+    ]
+  },
+  {
+    name: "王振宇 组（带组教授）",
+    doctors: [
+      { name: "王振宇", title: "带组教授", phone: "" },
+      { name: "王莹",   title: "医生", phone: "15044301015" }
+    ]
+  }
+];
+// ============================================
+
+const callIcon = '<svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.4c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.3 1l-2.1 2.2z"/></svg>';
+
+function render() {
+  const q = document.getElementById('q').value.trim();
+  const list = document.getElementById('list');
+  let html = '';
+  let total = 0;
+  groups.forEach(g => {
+    const docs = g.doctors.filter(d => d.name.includes(q) || d.phone.includes(q));
+    if (docs.length === 0) return;
+    total += docs.length;
+    html += '<div class="group"><div class="group-title">' + g.name + '</div>';
+    docs.forEach(d => {
+      const action = d.phone
+        ? '<a class="call" href="tel:' + d.phone + '">' + callIcon + '拨打</a>'
+        : '<span class="pending">电话待补充</span>';
+      html += '<div class="card">'
+        + '<div class="info"><div class="name">' + d.name + '</div>'
+        + '<div class="meta">' + d.title + '</div></div>'
+        + action
+        + '</div>';
+    });
+    html += '</div>';
+  });
+  list.innerHTML = total === 0 ? '<div class="empty">没有找到匹配的医生</div>' : html;
+}
+
+render();
+</script>
+</body>
+</html>
