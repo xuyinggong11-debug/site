@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>真假大挑战 · 游戏专区</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;font-family:-apple-system,"Microsoft YaHei",sans-serif;background:#f2f5f9;color:#1f2d3d;font-size:22px}
+  .top{background:linear-gradient(135deg,#1565c0,#1e88e5);color:#fff;padding:24px 18px;text-align:center}
+  .top h1{margin:0;font-size:27px;font-weight:800}
+  .top p{margin:6px 0 0;font-size:16px;opacity:.92}
+  .wrap{max-width:640px;margin:16px auto;padding:0 14px}
+  .panel{background:#fff;border-radius:16px;padding:24px 20px;box-shadow:0 2px 10px rgba(0,0,0,.06);margin-bottom:16px}
+  .scorebar{display:flex;justify-content:center;gap:18px;font-size:17px;color:#1565c0;font-weight:700;margin-bottom:12px}
+  .statement{font-size:26px;line-height:1.6;font-weight:800;text-align:center;padding:10px 4px 6px;min-height:120px;display:flex;align-items:center;justify-content:center}
+  .btns{display:flex;gap:14px;margin-top:10px}
+  .btns button{flex:1;border:none;border-radius:14px;padding:22px 0;font-size:26px;font-weight:800;cursor:pointer;transition:.12s}
+  .btn-true{background:#2e7d32;color:#fff}
+  .btn-false{background:#c62828;color:#fff}
+  .btns button:active{transform:scale(.97)}
+  .btns button:disabled{opacity:.55}
+  .feedback{margin-top:16px;border-radius:14px;padding:20px 18px;font-size:20px;line-height:1.7;display:none}
+  .fb-ok{background:#e8f5e9;border:2px solid #2e7d32;color:#1b5e20}
+  .fb-no{background:#ffebee;border:2px solid #c62828;color:#b71c1c}
+  .fb-title{font-size:23px;font-weight:800;margin-bottom:8px}
+  .fb-src{margin-top:10px;font-size:15px;color:#556;background:rgba(255,255,255,.7);border-radius:8px;padding:8px 12px}
+  .nextbtn{display:none;width:100%;margin-top:14px;background:#1565c0;color:#fff;border:none;border-radius:14px;padding:20px 0;font-size:23px;font-weight:800}
+  .result{display:none;text-align:center}
+  .result .big{font-size:52px;margin:6px 0}
+  .result h2{font-size:29px;margin:8px 0;color:#1565c0}
+  .result p{font-size:19px;line-height:1.7;color:#334;margin:10px 0}
+  .result .rebtn{width:100%;background:#2e7d32;color:#fff;border:none;border-radius:14px;padding:22px 0;font-size:24px;font-weight:800;margin-top:14px}
+  .back{display:block;text-align:center;margin:20px auto 8px;color:#1565c0;text-decoration:none;font-size:19px}
+  .srcbox{max-width:640px;margin:0 auto 12px;padding:16px 18px;background:#fff;border-radius:12px;border:1px solid #dbe4ee;font-size:15px;color:#556;line-height:1.9}
+  .srcbox b{color:#1f2d3d;font-size:16px}
+  .warn{max-width:640px;margin:0 auto 10px;padding:10px 16px;font-size:15px;color:#8a6d1a;background:#fff8e1;border:1px solid #ffe082;border-radius:10px;text-align:center}
+  .foot{max-width:640px;margin:4px auto 30px;padding:0 18px;font-size:15px;color:#889;line-height:1.8;text-align:center}
+</style>
+</head>
+<body>
+<div class="top">
+  <h1>⚖️ 真假大挑战</h1>
+  <p>游戏专区 · 判断真假 · 越玩越懂</p>
+</div>
+
+<div class="wrap">
+  <div class="panel" id="game">
+    <div class="scorebar"><span>第 <b id="cur">1</b> 题 / 共 <b id="total"></b> 题</span><span>答对 <b id="right">0</b> 题</span></div>
+    <div class="statement" id="statement"></div>
+    <div class="btns">
+      <button class="btn-true" id="btnTrue" onclick="answer(true)">真 ✓</button>
+      <button class="btn-false" id="btnFalse" onclick="answer(false)">假 ✗</button>
+    </div>
+    <div class="feedback" id="feedback">
+      <div class="fb-title" id="fbTitle"></div>
+      <div id="fbText"></div>
+      <div class="fb-src" id="fbSrc"></div>
+    </div>
+    <button class="nextbtn" id="nextBtn" onclick="next()">下一题 →</button>
+  </div>
+
+  <div class="panel result" id="result">
+    <div class="big">🎉</div>
+    <h2 id="resultTitle"></h2>
+    <p id="resultText"></p>
+    <button class="rebtn" onclick="start()">再玩一次 ↺</button>
+  </div>
+
+  <a class="back" href="youxi.html">← 返回游戏专区</a>
+</div>
+
+<div class="warn">📢 本页题目为科普初稿，正在由科室医生审核中，如有出入以医生解释为准</div>
+<div class="srcbox">
+  <b>📖 本游戏题目主要依据来源：</b><br>
+  · 国家卫生健康委员会《乳腺癌筛查工作方案》（2021年印发）<br>
+  · 《中国抗癌协会乳腺癌诊治指南与规范》（中国抗癌协会乳腺癌专业委员会）<br>
+  · 国家癌症中心发布的全国肿瘤统计与防治科普资料<br>
+  · 世界卫生组织（WHO）乳腺癌防治相关科普资料<br>
+  <span style="color:#8a6d1a">以上为方向性依据，题目表述最终以科室医生审核版本为准。</span>
+</div>
+<div class="foot">本游戏仅供健康科普，不能替代医生的面诊<br>如有不适请及时到乳腺外科就诊</div>
+
+<script>
+// 题库：q 说法 / a true=真 false=假 / why 通俗讲解 / src 依据来源
+// 【待医生核】全部题目为初稿，上线前请科室医生逐条审核表述与答案
+var QUESTIONS = [
+  {q:"乳腺增生绝大多数是良性的，不能直接等同于乳腺癌", a:true, why:"真。乳腺增生是常见现象，绝大多数不会癌变。查出增生先别慌，按医嘱定期复查即可。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"乳腺癌是我国女性发病率最高的恶性肿瘤之一", a:true, why:"真。国家癌症中心发布的数据显示，乳腺癌长期位居我国女性恶性肿瘤发病前列，重视筛查很有必要。", src:"国家癌症中心全国肿瘤统计数据"},
+  {q:"男性也可能得乳腺癌", a:true, why:"真。男性同样有乳腺组织，也会患病，只是比例远低于女性。男性发现乳房肿块同样要及时就医。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"月经结束后一周左右，是乳房自查的好时机", a:true, why:"真。这个阶段乳腺受激素影响最小、最松软，容易摸清情况。建议每月固定这个时间自查一次。", src:"国家卫健委乳腺癌筛查相关科普；中华医学会科普建议"},
+  {q:"绝经以后没有月经了，就不用再做乳腺检查了", a:false, why:"假。绝经后乳腺癌风险反而不降，建议固定选每月同一天自查，并按医生安排继续定期筛查。", src:"国家卫健委《乳腺癌筛查工作方案》"},
+  {q:"乳房上摸到不痛的肿块，就不用管它", a:false, why:"假！恰恰相反，不痛的肿块更要重视——很多乳腺恶性病变早期并不疼。只要摸到肿块，无论痛不痛都应及时就医。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"做按摩、吃保健品可以把乳腺结节揉掉或吃掉", a:false, why:"假。没有可靠证据支持，盲目按摩刺激反而可能耽误病情。发现结节请到正规医院就诊。", src:"国家卫健委及中国抗癌协会相关辟谣科普"},
+  {q:"40岁以上的女性，建议定期接受乳腺筛查", a:true, why:"真。国家推动的乳腺癌筛查项目就覆盖适龄女性，40岁起定期做乳腺B超、钼靶等检查，能早期发现问题。具体频率听医生安排。", src:"国家卫健委《乳腺癌筛查工作方案》（2021年）"},
+  {q:"豆浆喝多了会得乳腺癌", a:false, why:"假。豆浆里的植物雌激素活性很低，正常饮用不会诱发乳腺癌，适量豆制品反而是健康的饮食习惯。", src:"世界卫生组织（WHO）及中国营养学会相关科普"},
+  {q:"胸罩穿得太紧会导致乳腺癌", a:false, why:"假。目前没有证据表明胸罩松紧和乳腺癌有关。选舒适合适的内衣即可，不必担心。", src:"世界卫生组织（WHO）乳腺癌危险因素科普"},
+  {q:"母乳喂养能降低乳腺癌的发生风险", a:true, why:"真。哺乳对母婴都有好处，世界卫生组织提倡母乳喂养，研究显示哺乳对降低乳腺癌风险有帮助。", src:"世界卫生组织（WHO）母乳喂养与乳腺癌相关资料"},
+  {q:"肥胖会增加乳腺癌的风险", a:true, why:"真。尤其绝经后肥胖，风险会升高。控制体重、均衡饮食、多运动，就是在保护乳腺。", src:"世界卫生组织（WHO）乳腺癌危险因素科普"},
+  {q:"长期吸烟喝酒跟乳腺癌没有关系", a:false, why:"假。饮酒是明确的乳腺癌危险因素之一，吸烟也与多种癌症相关。少喝酒、不吸烟，乳腺和全身都受益。", src:"世界卫生组织（WHO）癌症危险因素资料"},
+  {q:"坚持规律运动，有助于降低乳腺癌风险", a:true, why:"真。运动能帮助控制体重、改善代谢，是公认的保护因素。每周动起来，不追求剧烈，贵在坚持。", src:"世界卫生组织（WHO）身体活动与癌症预防建议"},
+  {q:"长期熬夜、精神压力大，跟乳腺健康没有关系", a:false, why:"假。长期作息紊乱、情绪压力大，会影响内分泌，对乳腺健康不利。好心情本身就是一剂良药。", src:"中华医学会相关健康科普"},
+  {q:"乳头出现血性溢液，应引起重视、及时就诊", a:true, why:"真。尤其单侧、单个乳孔、带血或咖啡色的溢液，不要拖延，尽快到乳腺外科检查。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"钼靶检查特别疼、辐射大，做了反而有害", a:false, why:"假。钼靶的辐射量很低，在安全范围内；检查时稍有压迫感，几秒钟就过去。它对早期发现病灶很有价值，该做就做。", src:"国家卫健委乳腺癌筛查项目科普材料"},
+  {q:"定期筛查能早期发现乳腺癌，早期发现的治愈率高", a:true, why:"真。早发现、早诊断、早治疗是应对乳腺癌最有效的办法，很多早期患者治疗效果非常好。", src:"国家癌症中心防治科普；《中国抗癌协会乳腺癌诊治指南与规范》"},
+  {q:"只有中老年女性才需要关心乳腺健康", a:false, why:"假。年轻女性也可能出问题，男性也有极少数患病。全年龄段都值得了解这些知识。", src:"国家卫健委乳腺癌筛查科普"},
+  {q:"副乳也可能生病，同样需要关注", a:true, why:"真。副乳也有腺体组织，可能在经期胀痛，也可能发生病变。发现副乳有明显变化时同样要就医。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"确诊乳腺癌就必须切除整个乳房", a:false, why:"假。现在治疗讲究个体化，部分患者可以选择保乳手术或乳房再造方案。具体方案由医生根据病情制定，别被传言吓倒。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"母亲或姐妹得过乳腺癌，自己患病的风险会增加", a:true, why:"真。乳腺癌有家族聚集倾向，有家族史的人更要重视定期筛查，建议提前和医生沟通筛查方案。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"做一次乳腺B超没发现问题，以后就再也不用查了", a:false, why:"假。一次检查正常只代表当时没事，乳腺情况会变化，需要按医生建议的间隔定期复查。", src:"国家卫健委《乳腺癌筛查工作方案》"},
+  {q:"乳腺癌会传染给别人", a:false, why:"假。癌症不是传染病，不会通过接触、共同吃饭传染。关爱患者，不必有任何隔离顾虑。", src:"世界卫生组织（WHO）癌症科普"},
+  {q:"年轻女性就完全不用担心乳腺问题", a:false, why:"假。年轻女性也可能患乳腺疾病，有不适随时就诊；有家族史等高危因素的人还应提前和医生商量筛查安排。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"怀孕或哺乳期间发现乳房肿块，不用检查", a:false, why:"假。孕期哺乳期同样可能发生乳腺疾病，发现肿块、疼痛、溢液应正常就医，医生会选择对母婴安全的检查方式。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"自己在家自查乳房，就可以代替医院的专业筛查", a:false, why:"假。自查帮助熟悉自己的乳房、便于发现变化，但一些早期病灶摸不出来，不能替代B超、钼靶等专业筛查。两手都要抓。", src:"国家卫健委乳腺癌筛查科普；《中国抗癌协会乳腺癌诊治指南与规范》"},
+  {q:"乳腺B超和钼靶各有优势，医生会根据情况选择或结合使用", a:true, why:"真。B超对致密型乳腺、年轻女性更有优势，钼靶擅长发现钙化灶，两者常互为补充，听医生安排就好。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"乳腺癌治疗结束、出院回家后，就不需要再回医院复查了", a:false, why:"假。治疗后的定期复查非常重要，能及时发现变化、处理后续问题。按医生给的复查时间表坚持来院。", src:"《中国抗癌协会乳腺癌诊治指南与规范》相关章节"},
+  {q:"多吃蔬菜水果、保持均衡饮食，对乳腺健康有好处", a:true, why:"真。均衡饮食、控制体重是公认的健康生活方式，也是癌症预防的共同建议。", src:"世界卫生组织（WHO）健康饮食与癌症预防建议"}
+];
+
+var order=[], idx=0, right=0;
+var elCur=document.getElementById('cur'), elTotal=document.getElementById('total'),
+    elRight=document.getElementById('right'), elSt=document.getElementById('statement'),
+    fb=document.getElementById('feedback'), fbT=document.getElementById('fbTitle'), fbX=document.getElementById('fbText'),
+    fbS=document.getElementById('fbSrc'),
+    bT=document.getElementById('btnTrue'), bF=document.getElementById('btnFalse'),
+    nb=document.getElementById('nextBtn'), game=document.getElementById('game'), res=document.getElementById('result');
+
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+
+function start(){
+  order=shuffle(QUESTIONS.slice());
+  idx=0; right=0;
+  elTotal.textContent=order.length;
+  game.style.display='block'; res.style.display='none';
+  show();
+}
+
+function show(){
+  var q=order[idx];
+  elCur.textContent=idx+1; elRight.textContent=right;
+  elSt.textContent="「 "+q.q+" 」";
+  fb.style.display='none'; nb.style.display='none';
+  bT.disabled=false; bF.disabled=false;
+}
+
+function answer(choice){
+  var q=order[idx];
+  bT.disabled=true; bF.disabled=true;
+  var ok = (choice===q.a);
+  if(ok) right++;
+  elRight.textContent=right;
+  fb.className='feedback '+(ok?'fb-ok':'fb-no');
+  fbT.textContent = ok ? '✅ 答对啦！' : '❌ 答错啦，记住这个：';
+  fbX.textContent = q.why;
+  fbS.textContent = '📖 依据：' + q.src + '（初稿，待医生审核）';
+  fb.style.display='block';
+  nb.textContent = (idx+1>=order.length) ? '查看成绩 →' : '下一题 →';
+  nb.style.display='block';
+}
+
+function next(){
+  idx++;
+  if(idx>=order.length){ finish(); } else { show(); }
+}
+
+function finish(){
+  game.style.display='none'; res.style.display='block';
+  var pct=Math.round(right/order.length*100);
+  var title, text;
+  if(pct===100){ title='满分！乳腺健康知识大师'; text='全对了！您已经是身边的“乳腺科普宣传员”，把学到的话讲给家人听吧！'; }
+  else if(pct>=80){ title='太棒了，乳腺健康达人'; text='答对 '+right+' / '+order.length+' 题！知识掌握得很扎实，错过的题记得看上面的讲解和依据巩固一下。'; }
+  else if(pct>=60){ title='不错，继续加油'; text='答对 '+right+' / '+order.length+' 题。健康知识记牢一点，就医路上少走弯路，再玩一次巩固巩固！'; }
+  else { title='收获满满，再来一轮'; text='答对 '+right+' / '+order.length+' 题。没关系，每道答错的题都配了大白话讲解和依据来源，多玩两轮就全记住啦！'; }
+  document.getElementById('resultTitle').textContent=title;
+  document.getElementById('resultText').textContent=text;
+  window.scrollTo(0,0);
+}
+
+start();
+</script>
+</body>
+</html>
